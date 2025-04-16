@@ -1,0 +1,201 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>模型训练</h2>
+        <div>
+            <a href="{{ url_for('dashboard') }}" class="btn btn-outline-primary me-2">返回仪表盘</a>
+            <a href="{{ url_for('logout') }}" class="btn btn-outline-danger">登出</a>
+        </div>
+    </div>
+    
+    {% if training_submitted %}
+    <div class="card mb-4">
+        <div class="card-header bg-success text-white">
+            <h3 class="card-title mb-0"><i class="bi bi-check-circle-fill me-2"></i>训练任务已提交</h3>
+        </div>
+        <div class="card-body">
+            <div class="alert alert-success">
+                <p><strong>您的模型训练任务已成功提交！</strong> 系统正在处理您的请求。训练完成后，您将可以通过仪表盘访问结果。</p>
+            </div>
+            
+            <h4 class="mt-4 mb-3">训练配置摘要</h4>
+            <div class="table-responsive">
+                <table class="table table-bordered">
+                    <tbody>
+                        <tr>
+                            <th style="width: 30%">数据集</th>
+                            <td>{{ training_config.dataset }}</td>
+                        </tr>
+                        <tr>
+                            <th>模型类型</th>
+                            <td>{{ training_config.model_type }}</td>
+                        </tr>
+                        <tr>
+                            <th>训练轮次</th>
+                            <td>{{ training_config.epochs }}</td>
+                        </tr>
+                        <tr>
+                            <th>学习率</th>
+                            <td>{{ training_config.learning_rate }}</td>
+                        </tr>
+                        <tr>
+                            <th>批次大小</th>
+                            <td>{{ training_config.batch_size }}</td>
+                        </tr>
+                        <tr>
+                            <th>优化器</th>
+                            <td>{{ training_config.optimizer }}</td>
+                        </tr>
+                        <tr>
+                            <th>GPU加速</th>
+                            <td>{% if training_config.use_gpu %}是{% else %}否{% endif %}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            
+            <div class="d-grid gap-2 mt-4">
+                <a href="{{ url_for('training') }}" class="btn btn-primary">
+                    <i class="bi bi-arrow-clockwise me-2"></i>提交新的训练任务
+                </a>
+            </div>
+        </div>
+    </div>
+    {% else %}
+    <div class="card mb-4">
+        <div class="card-body">
+            <h3 class="card-title">训练配置</h3>
+            <p class="card-text">请配置模型训练参数</p>
+            
+            <form method="post" class="training-form mt-4">
+                <div class="row mb-4">
+                    <div class="col-md-6">
+                        <div class="card h-100">
+                            <div class="card-header bg-primary text-white">
+                                <h5 class="mb-0">数据集选择</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="form-check mb-3">
+                                    <input class="form-check-input" type="radio" name="dataset" id="dataset_lmt" value="LMT" checked>
+                                    <label class="form-check-label" for="dataset_lmt">
+                                        <strong>LMT数据集</strong>
+                                        <div class="text-muted small">适用于压力触觉生成任务</div>
+                                    </label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="dataset" id="dataset_haptex" value="Haptex">
+                                    <label class="form-check-label" for="dataset_haptex">
+                                        <strong>Haptex数据集</strong>
+                                        <div class="text-muted small">适用于表面纹理触觉生成任务</div>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="card h-100">
+                            <div class="card-header bg-success text-white">
+                                <h5 class="mb-0">模型选择</h5>
+                            </div>
+                            <div class="card-body">
+                                <select class="form-select mb-3" name="model_type" id="model_type">
+                                    <option value="cnn">CNN (卷积神经网络)</option>
+                                    <option value="lstm">LSTM (长短期记忆网络)</option>
+                                    <option value="transformer">Transformer</option>
+                                    <option value="gan">GAN (生成对抗网络)</option>
+                                </select>
+                                <div class="text-muted small">选择适合您任务的模型架构</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card mb-4">
+                    <div class="card-header bg-info text-white">
+                        <h5 class="mb-0">训练超参数</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="epochs" class="form-label">训练轮次</label>
+                                <div class="input-group">
+                                    <input type="number" class="form-control" id="epochs" name="epochs" min="1" max="1000" value="100">
+                                    <span class="input-group-text">轮</span>
+                                </div>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="learning_rate" class="form-label">学习率</label>
+                                <div class="input-group">
+                                    <select class="form-select" id="learning_rate" name="learning_rate">
+                                        <option value="0.1">0.1</option>
+                                        <option value="0.01">0.01</option>
+                                        <option value="0.001" selected>0.001</option>
+                                        <option value="0.0001">0.0001</option>
+                                        <option value="0.00001">0.00001</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="batch_size" class="form-label">批次大小</label>
+                                <div class="input-group">
+                                    <input type="number" class="form-control" id="batch_size" name="batch_size" min="1" max="512" value="32">
+                                    <span class="input-group-text">样本/批次</span>
+                                </div>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="optimizer" class="form-label">优化器</label>
+                                <select class="form-select" id="optimizer" name="optimizer">
+                                    <option value="adam">Adam</option>
+                                    <option value="sgd">SGD</option>
+                                    <option value="rmsprop">RMSprop</option>
+                                    <option value="adagrad">Adagrad</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <div class="form-check form-switch mb-3">
+                            <input class="form-check-input" type="checkbox" id="use_gpu" name="use_gpu" checked>
+                            <label class="form-check-label" for="use_gpu">使用GPU加速训练</label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card mb-4">
+                    <div class="card-header bg-warning text-dark">
+                        <h5 class="mb-0">高级选项</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="validation_split" class="form-label">验证集比例</label>
+                                <div class="input-group">
+                                    <input type="number" class="form-control" id="validation_split" name="validation_split" min="0.1" max="0.5" step="0.05" value="0.2">
+                                    <span class="input-group-text">%</span>
+                                </div>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="early_stopping" class="form-label">早停轮次</label>
+                                <input type="number" class="form-control" id="early_stopping" name="early_stopping" min="0" max="100" value="10">
+                                <div class="form-text">连续多少轮验证损失不下降时停止训练（0表示禁用早停）</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="d-grid gap-2">
+                    <button type="submit" class="btn btn-primary btn-lg">
+                        <i class="bi bi-play-fill me-2"></i>开始训练
+                    </button>
+                </div>
+            </form>
+            
+            <div class="alert alert-success mt-4">
+                <i class="bi bi-info-circle me-2"></i>训练完成后，您可以在仪表盘中查看训练结果。
+            </div>
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %} 

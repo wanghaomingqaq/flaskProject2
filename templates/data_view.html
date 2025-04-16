@@ -1,0 +1,99 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>数据查看</h2>
+        <div>
+            <a href="{{ url_for('dashboard') }}" class="btn btn-outline-primary me-2">返回仪表盘</a>
+            <a href="{{ url_for('logout') }}" class="btn btn-outline-danger">登出</a>
+        </div>
+    </div>
+    
+    <div class="card mb-4">
+        <div class="card-body">
+            <h3 class="card-title">触觉数据浏览</h3>
+            
+            <div id="image-viewer" class="mt-4">
+                {% if image_files %}
+                    <div class="text-center mb-3">
+                        <h4 id="image-title" class="text-muted">图片加载中...</h4>
+                    </div>
+                    <div class="image-container mb-4">
+                        <img id="current-image" class="img-fluid mx-auto d-block border rounded shadow-sm" 
+                             style="max-height: 500px;" alt="触觉数据图像">
+                    </div>
+                    <div class="d-flex justify-content-between">
+                        <button id="prev-image" class="btn btn-primary">
+                            <i class="bi bi-arrow-left"></i> 上一张
+                        </button>
+                        <div class="image-counter">
+                            <span id="current-index">0</span> / <span id="total-images">{{ total_images }}</span>
+                        </div>
+                        <button id="next-image" class="btn btn-primary">
+                            下一张 <i class="bi bi-arrow-right"></i>
+                        </button>
+                    </div>
+                {% else %}
+                    <div class="alert alert-warning">
+                        <i class="bi bi-exclamation-triangle me-2"></i>没有找到图片数据。请将图片文件放入 data 目录。
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // 当页面加载完成后执行
+    document.addEventListener('DOMContentLoaded', function() {
+        let currentIndex = 0;
+        
+        // 获取元素
+        const currentImage = document.getElementById('current-image');
+        const imageTitle = document.getElementById('image-title');
+        const currentIndexElement = document.getElementById('current-index');
+        const totalImagesElement = document.getElementById('total-images');
+        const prevButton = document.getElementById('prev-image');
+        const nextButton = document.getElementById('next-image');
+        
+        // 加载图片函数
+        function loadImage(index) {
+            fetch('/get_image/' + index)
+                .then(response => response.json())
+                .then(data => {
+                    currentImage.src = data.image_url;
+                    imageTitle.textContent = data.filename;
+                    currentIndex = data.current_index;
+                    currentIndexElement.textContent = data.current_index + 1;
+                    totalImagesElement.textContent = data.total_images;
+                })
+                .catch(error => {
+                    console.error('加载图片时出错:', error);
+                    imageTitle.textContent = '加载图片失败';
+                });
+        }
+        
+        // 加载第一张图片
+        loadImage(0);
+        
+        // 绑定按钮事件
+        prevButton.addEventListener('click', function() {
+            loadImage(currentIndex - 1);
+        });
+        
+        nextButton.addEventListener('click', function() {
+            loadImage(currentIndex + 1);
+        });
+        
+        // 添加键盘快捷键
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'ArrowLeft') {
+                prevButton.click();
+            } else if (event.key === 'ArrowRight') {
+                nextButton.click();
+            }
+        });
+    });
+</script>
+{% endblock %} 

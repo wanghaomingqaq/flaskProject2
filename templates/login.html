@@ -1,0 +1,23 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<div class="auth-container">
+    <h2 class="text-center mb-4">登录</h2>
+    <form method="post">
+        <div class="mb-3">
+            <label for="username" class="form-label">用户名</label>
+            <input type="text" class="form-control" id="username" name="username" required>
+        </div>
+        <div class="mb-3">
+            <label for="password" class="form-label">密码</label>
+            <input type="password" class="form-control" id="password" name="password" required>
+        </div>
+        <div class="d-grid">
+            <button type="submit" class="btn btn-primary">登录</button>
+        </div>
+    </form>
+    <div class="auth-toggle">
+        还没有账号？<a href="{{ url_for('register') }}">注册</a>
+    </div>
+</div>
+{% endblock %} 

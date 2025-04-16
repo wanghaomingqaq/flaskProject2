@@ -1,0 +1,27 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>频谱生成</h2>
+        <div>
+            <a href="{{ url_for('dashboard') }}" class="btn btn-outline-primary me-2">返回仪表盘</a>
+            <a href="{{ url_for('logout') }}" class="btn btn-outline-danger">登出</a>
+        </div>
+    </div>
+    <div class="card mb-4">
+        <div class="card-body">
+            <h3 class="card-title">频谱生成功能</h3>
+            <p class="card-text">在这里您可以生成触觉信号的频谱。</p>
+            
+            <div class="row mt-4">
+                <div class="col-md-12">
+                    <div class="alert alert-info">
+                        <i class="bi bi-soundwave me-2"></i>此功能模块尚在开发中，即将上线。
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 
