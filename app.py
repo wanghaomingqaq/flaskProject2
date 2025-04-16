@@ -148,17 +148,135 @@ def training():
     
     return render_template('training.html', title='触觉生成仿真平台')
 
-@app.route('/spectrum')
+# 获取生成频谱图片列表
+def get_generated_spectrum_images():
+    spectrum_dir = os.path.join(app.root_path, 'data', 'spec', 'gene')
+    if not os.path.exists(spectrum_dir):
+        os.makedirs(spectrum_dir, exist_ok=True)
+    return sorted([f for f in os.listdir(spectrum_dir) if f.endswith(('.png', '.jpg', '.jpeg', '.gif'))])
+
+# 获取真实频谱图片列表
+def get_real_spectrum_images():
+    spectrum_dir = os.path.join(app.root_path, 'data', 'spec', 'real')
+    if not os.path.exists(spectrum_dir):
+        os.makedirs(spectrum_dir, exist_ok=True)
+    return sorted([f for f in os.listdir(spectrum_dir) if f.endswith(('.png', '.jpg', '.jpeg', '.gif'))])
+
+@app.route('/spectrum', methods=['GET'])
 def spectrum():
     if 'username' not in session:
         return redirect(url_for('login'))
-    return render_template('spectrum.html', title='频谱生成 - 触觉生成仿真平台', username=session['username'])
+    
+    # 获取频谱图片列表
+    generated_images = get_generated_spectrum_images()
+    real_images = get_real_spectrum_images()
+    
+    # 获取当前显示的图片索引
+    generated_index = request.args.get('gen_idx', 0, type=int)
+    real_index = request.args.get('real_idx', 0, type=int)
+    
+    # 确保索引在有效范围内
+    if generated_images:
+        generated_index = max(0, min(generated_index, len(generated_images) - 1))
+        current_generated = generated_images[generated_index]
+    else:
+        current_generated = None
+    
+    if real_images:
+        real_index = max(0, min(real_index, len(real_images) - 1))
+        current_real = real_images[real_index]
+    else:
+        current_real = None
+    
+    return render_template('spectrum.html', 
+                          title='触觉生成仿真平台',
+                          generated_images=generated_images,
+                          real_images=real_images,
+                          generated_index=generated_index,
+                          real_index=real_index,
+                          current_generated=current_generated,
+                          current_real=current_real)
 
-@app.route('/signal_conversion')
+@app.route('/spectrum/image/<path:directory>/<filename>')
+def get_spectrum_image(directory, filename):
+    if 'username' not in session:
+        return redirect(url_for('login'))
+    
+    return send_from_directory(os.path.join(app.root_path, 'data', 'spec', directory), filename)
+
+# 获取生成信号图片列表
+def get_generated_signal_images():
+    signal_dir = os.path.join(app.root_path, 'data', 'signal', 'gene')
+    if not os.path.exists(signal_dir):
+        os.makedirs(signal_dir, exist_ok=True)
+    return sorted([f for f in os.listdir(signal_dir) if f.endswith(('.png', '.jpg', '.jpeg', '.gif'))])
+
+# 获取真实信号图片列表
+def get_real_signal_images():
+    signal_dir = os.path.join(app.root_path, 'data', 'signal', 'real')
+    if not os.path.exists(signal_dir):
+        os.makedirs(signal_dir, exist_ok=True)
+    return sorted([f for f in os.listdir(signal_dir) if f.endswith(('.png', '.jpg', '.jpeg', '.gif'))])
+
+# 获取信号对比图片列表
+def get_compare_signal_images():
+    signal_dir = os.path.join(app.root_path, 'data', 'signal', 'compare')
+    if not os.path.exists(signal_dir):
+        os.makedirs(signal_dir, exist_ok=True)
+    return sorted([f for f in os.listdir(signal_dir) if f.endswith(('.png', '.jpg', '.jpeg', '.gif'))])
+
+@app.route('/signal_conversion', methods=['GET'])
 def signal_conversion():
     if 'username' not in session:
         return redirect(url_for('login'))
-    return render_template('signal_conversion.html', title='信号转换 - 触觉生成仿真平台', username=session['username'])
+    
+    # 获取信号图片列表
+    generated_images = get_generated_signal_images()
+    real_images = get_real_signal_images()
+    compare_images = get_compare_signal_images()
+    
+    # 获取当前显示的图片索引
+    generated_index = request.args.get('gen_idx', 0, type=int)
+    real_index = request.args.get('real_idx', 0, type=int)
+    compare_index = request.args.get('comp_idx', 0, type=int)
+    
+    # 确保索引在有效范围内
+    if generated_images:
+        generated_index = max(0, min(generated_index, len(generated_images) - 1))
+        current_generated = generated_images[generated_index]
+    else:
+        current_generated = None
+    
+    if real_images:
+        real_index = max(0, min(real_index, len(real_images) - 1))
+        current_real = real_images[real_index]
+    else:
+        current_real = None
+        
+    if compare_images:
+        compare_index = max(0, min(compare_index, len(compare_images) - 1))
+        current_compare = compare_images[compare_index]
+    else:
+        current_compare = None
+    
+    return render_template('signal_conversion.html', 
+                          title='触觉生成仿真平台',
+                          generated_images=generated_images,
+                          real_images=real_images,
+                          compare_images=compare_images,
+                          generated_index=generated_index,
+                          real_index=real_index,
+                          compare_index=compare_index,
+                          current_generated=current_generated,
+                          current_real=current_real,
+                          current_compare=current_compare)
+
+@app.route('/signal/image/<path:directory>/<filename>')
+def get_signal_image(directory, filename):
+    if 'username' not in session:
+        return redirect(url_for('login'))
+    
+    return send_from_directory(os.path.join(app.root_path, 'data', 'signal', directory), filename)
 
 if __name__ == '__main__':
     app.run(debug=True)

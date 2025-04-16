@@ -9,15 +9,138 @@
             <a href="{{ url_for('logout') }}" class="btn btn-outline-danger">登出</a>
         </div>
     </div>
-    <div class="card mb-4">
-        <div class="card-body">
-            <h3 class="card-title">信号转换功能</h3>
-            <p class="card-text">在这里您可以进行不同类型触觉信号之间的转换。</p>
-            
-            <div class="row mt-4">
-                <div class="col-md-12">
-                    <div class="alert alert-warning">
-                        <i class="bi bi-arrow-left-right me-2"></i>此功能模块尚在开发中，即将上线。
+
+    <!-- 生成信号和真实信号展示区 -->
+    <div class="row mb-4">
+        <!-- 生成信号部分 -->
+        <div class="col-md-6 mb-4">
+            <div class="card signal-card h-100">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0">生成信号</h4>
+                </div>
+                <div class="card-body d-flex flex-column">
+                    <div class="signal-container mb-3">
+                        {% if current_generated %}
+                            <img src="{{ url_for('get_signal_image', directory='gene', filename=current_generated) }}" 
+                                 class="img-fluid signal-img" alt="生成信号图像">
+                            <div class="text-center mt-2 text-muted">
+                                图像 {{ generated_index + 1 }}/{{ generated_images|length }} - {{ current_generated }}
+                            </div>
+                        {% else %}
+                            <div class="alert alert-info text-center py-5">
+                                <i class="bi bi-exclamation-circle me-2"></i>无可用的生成信号图像
+                            </div>
+                        {% endif %}
+                    </div>
+                    
+                    {% if generated_images %}
+                    <div class="mt-auto">
+                        <div class="d-flex justify-content-between">
+                            <a href="{{ url_for('signal_conversion', gen_idx=generated_index-1, real_idx=real_index, comp_idx=compare_index) }}" 
+                               class="btn btn-outline-primary {% if generated_index == 0 %}disabled{% endif %}">
+                                <i class="bi bi-arrow-left me-1"></i>上一张
+                            </a>
+                            <a href="{{ url_for('signal_conversion', gen_idx=generated_index+1, real_idx=real_index, comp_idx=compare_index) }}" 
+                               class="btn btn-outline-primary {% if generated_index == generated_images|length - 1 %}disabled{% endif %}">
+                                下一张<i class="bi bi-arrow-right ms-1"></i>
+                            </a>
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        
+        <!-- 真实信号部分 -->
+        <div class="col-md-6 mb-4">
+            <div class="card signal-card h-100">
+                <div class="card-header bg-success text-white">
+                    <h4 class="mb-0">真实信号</h4>
+                </div>
+                <div class="card-body d-flex flex-column">
+                    <div class="signal-container mb-3">
+                        {% if current_real %}
+                            <img src="{{ url_for('get_signal_image', directory='real', filename=current_real) }}" 
+                                 class="img-fluid signal-img" alt="真实信号图像">
+                            <div class="text-center mt-2 text-muted">
+                                图像 {{ real_index + 1 }}/{{ real_images|length }} - {{ current_real }}
+                            </div>
+                        {% else %}
+                            <div class="alert alert-info text-center py-5">
+                                <i class="bi bi-exclamation-circle me-2"></i>无可用的真实信号图像
+                            </div>
+                        {% endif %}
+                    </div>
+                    
+                    {% if real_images %}
+                    <div class="mt-auto">
+                        <div class="d-flex justify-content-between">
+                            <a href="{{ url_for('signal_conversion', gen_idx=generated_index, real_idx=real_index-1, comp_idx=compare_index) }}" 
+                               class="btn btn-outline-success {% if real_index == 0 %}disabled{% endif %}">
+                                <i class="bi bi-arrow-left me-1"></i>上一张
+                            </a>
+                            <a href="{{ url_for('signal_conversion', gen_idx=generated_index, real_idx=real_index+1, comp_idx=compare_index) }}" 
+                               class="btn btn-outline-success {% if real_index == real_images|length - 1 %}disabled{% endif %}">
+                                下一张<i class="bi bi-arrow-right ms-1"></i>
+                            </a>
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 对比图展示区 -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card signal-card">
+                <div class="card-header bg-warning text-dark">
+                    <h4 class="mb-0">信号对比</h4>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-8 mx-auto">
+                            <div class="signal-container mb-3">
+                                {% if current_compare %}
+                                    <img src="{{ url_for('get_signal_image', directory='compare', filename=current_compare) }}" 
+                                         class="img-fluid signal-img-large" alt="信号对比图像">
+                                    <div class="text-center mt-2 text-muted">
+                                        对比图 {{ compare_index + 1 }}/{{ compare_images|length }} - {{ current_compare }}
+                                    </div>
+                                {% else %}
+                                    <div class="alert alert-info text-center py-5">
+                                        <i class="bi bi-exclamation-circle me-2"></i>无可用的信号对比图像
+                                    </div>
+                                {% endif %}
+                            </div>
+                            
+                            {% if compare_images %}
+                            <div class="d-flex justify-content-center mt-3">
+                                <a href="{{ url_for('signal_conversion', gen_idx=generated_index, real_idx=real_index, comp_idx=compare_index-1) }}" 
+                                   class="btn btn-outline-warning me-2 {% if compare_index == 0 %}disabled{% endif %}">
+                                    <i class="bi bi-arrow-left me-1"></i>上一张
+                                </a>
+                                <a href="{{ url_for('signal_conversion', gen_idx=generated_index, real_idx=real_index, comp_idx=compare_index+1) }}" 
+                                   class="btn btn-outline-warning {% if compare_index == compare_images|length - 1 %}disabled{% endif %}">
+                                    下一张<i class="bi bi-arrow-right ms-1"></i>
+                                </a>
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <div class="mt-4 signal-legend">
+                        <div class="d-flex justify-content-center flex-wrap">
+                            <div class="legend-item me-4">
+                                <span class="legend-color" style="background-color: #3498db;"></span>
+                                <span class="legend-text">生成信号</span>
+                            </div>
+                            <div class="legend-item">
+                                <span class="legend-color" style="background-color: #f39c12;"></span>
+                                <span class="legend-text">真实信号</span>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
