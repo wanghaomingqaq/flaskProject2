@@ -175,6 +175,11 @@ def spectrum():
     generated_index = request.args.get('gen_idx', 0, type=int)
     real_index = request.args.get('real_idx', 0, type=int)
     
+    # 获取要显示的频谱类型（生成频谱或真实频谱）
+    spectrum_type = request.args.get('type', 'generated')
+    if spectrum_type not in ['generated', 'real']:
+        spectrum_type = 'generated'
+    
     # 确保索引在有效范围内
     if generated_images:
         generated_index = max(0, min(generated_index, len(generated_images) - 1))
@@ -195,7 +200,8 @@ def spectrum():
                           generated_index=generated_index,
                           real_index=real_index,
                           current_generated=current_generated,
-                          current_real=current_real)
+                          current_real=current_real,
+                          spectrum_type=spectrum_type)
 
 @app.route('/spectrum/image/<path:directory>/<filename>')
 def get_spectrum_image(directory, filename):
@@ -240,6 +246,11 @@ def signal_conversion():
     real_index = request.args.get('real_idx', 0, type=int)
     compare_index = request.args.get('comp_idx', 0, type=int)
     
+    # 获取要显示的信号类型
+    signal_type = request.args.get('type', 'generated')
+    if signal_type not in ['generated', 'real', 'compare']:
+        signal_type = 'generated'
+    
     # 确保索引在有效范围内
     if generated_images:
         generated_index = max(0, min(generated_index, len(generated_images) - 1))
@@ -269,7 +280,8 @@ def signal_conversion():
                           compare_index=compare_index,
                           current_generated=current_generated,
                           current_real=current_real,
-                          current_compare=current_compare)
+                          current_compare=current_compare,
+                          signal_type=signal_type)
 
 @app.route('/signal/image/<path:directory>/<filename>')
 def get_signal_image(directory, filename):

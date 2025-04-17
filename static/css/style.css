@@ -269,4 +269,131 @@ header h1 {
 
 .legend-text {
     font-size: 14px;
+}
+
+/* 信号转换页面侧边栏样式 */
+.signal-sidebar {
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+}
+
+.signal-sidebar .list-group-item {
+    padding: 15px;
+    transition: all 0.3s ease;
+    border-left: 3px solid transparent;
+}
+
+.signal-sidebar .list-group-item:hover {
+    background-color: #f8f9fa;
+    border-left-color: #3498db;
+}
+
+.signal-sidebar .list-group-item.active {
+    background-color: #e3f2fd;
+    border-left-color: #3498db;
+    color: #333;
+}
+
+.signal-sidebar .list-group-item.active .text-muted {
+    color: #555 !important;
+}
+
+.signal-info-card {
+    background-color: #f8f9fa;
+    border-radius: 5px;
+    padding: 12px;
+    margin-top: 10px;
+}
+
+.signal-info-card .info-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+    color: #3498db;
+    font-weight: bold;
+}
+
+/* 改进后的频谱页面样式 */
+.spectrum-sidebar {
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+}
+
+.spectrum-sidebar .list-group-item {
+    padding: 15px;
+    transition: all 0.3s ease;
+    border-left: 3px solid transparent;
+}
+
+.spectrum-sidebar .list-group-item:hover {
+    background-color: #f8f9fa;
+    border-left-color: #3498db;
+}
+
+.spectrum-sidebar .list-group-item.active {
+    background-color: #e3f2fd;
+    border-left-color: #3498db;
+    color: #333;
+}
+
+.spectrum-sidebar .list-group-item.active .text-muted {
+    color: #555 !important;
+}
+
+.spectrum-info-card {
+    background-color: #f8f9fa;
+    border-radius: 5px;
+    padding: 12px;
+    margin-top: 10px;
+}
+
+.spectrum-info-card .info-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+    color: #3498db;
+    font-weight: bold;
+}
+
+.spectrum-analysis-card {
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+}
+
+.feature-card {
+    display: flex;
+    align-items: center;
+    padding: 15px;
+    background-color: #f8f9fa;
+    border-radius: 8px;
+    margin-bottom: 10px;
+    transition: all 0.3s ease;
+}
+
+.feature-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+}
+
+.feature-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    margin-right: 15px;
+}
+
+.feature-info {
+    flex-grow: 1;
+}
+
+.feature-label {
+    font-size: 14px;
+    color: #666;
+    margin-bottom: 2px;
+}
+
+.feature-value {
+    font-size: 18px;
+    font-weight: bold;
 } 

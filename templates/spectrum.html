@@ -11,85 +11,100 @@
     </div>
 
     <div class="row">
-        <!-- 生成频谱部分 -->
-        <div class="col-md-6 mb-4">
-            <div class="card spectrum-card h-100">
-                <div class="card-header bg-info text-white">
-                    <h4 class="mb-0">生成频谱</h4>
+        <!-- 侧边栏切换按钮 -->
+        <div class="col-md-3">
+            <div class="card spectrum-sidebar mb-4">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">频谱类型</h5>
                 </div>
-                <div class="card-body d-flex flex-column">
-                    <div class="spectrum-container mb-3">
-                        {% if current_generated %}
-                            <img src="{{ url_for('get_spectrum_image', directory='gene', filename=current_generated) }}" 
-                                 class="img-fluid spectrum-img" alt="生成频谱图像">
-                            <div class="text-center mt-2 text-muted">
-                                图像 {{ generated_index + 1 }}/{{ generated_images|length }} - {{ current_generated }}
+                <div class="card-body p-0">
+                    <div class="list-group list-group-flush">
+                        <a href="{{ url_for('spectrum', type='generated', gen_idx=generated_index, real_idx=real_index) }}" 
+                           class="list-group-item list-group-item-action d-flex align-items-center {% if spectrum_type == 'generated' %}active{% endif %}">
+                            <i class="bi bi-soundwave me-3 fs-5"></i>
+                            <div>
+                                <strong>生成频谱</strong>
+                                <div class="small text-muted">模型生成的频谱数据</div>
                             </div>
-                        {% else %}
-                            <div class="alert alert-info text-center py-5">
-                                <i class="bi bi-exclamation-circle me-2"></i>无可用的生成频谱图像
+                        </a>
+                        <a href="{{ url_for('spectrum', type='real', gen_idx=generated_index, real_idx=real_index) }}" 
+                           class="list-group-item list-group-item-action d-flex align-items-center {% if spectrum_type == 'real' %}active{% endif %}">
+                            <i class="bi bi-bar-chart-line me-3 fs-5"></i>
+                            <div>
+                                <strong>真实频谱</strong>
+                                <div class="small text-muted">实际采集的频谱数据</div>
                             </div>
-                        {% endif %}
+                        </a>
                     </div>
-                    
-                    {% if generated_images %}
-                    <div class="mt-auto">
-                        <div class="d-flex justify-content-between">
-                            <a href="{{ url_for('spectrum', gen_idx=generated_index-1, real_idx=real_index) }}" 
-                               class="btn btn-outline-primary {% if generated_index == 0 %}disabled{% endif %}">
-                                <i class="bi bi-arrow-left me-1"></i>上一张
-                            </a>
-                            <a href="{{ url_for('spectrum', gen_idx=generated_index+1, real_idx=real_index) }}" 
-                               class="btn btn-outline-primary {% if generated_index == generated_images|length - 1 %}disabled{% endif %}">
-                                下一张<i class="bi bi-arrow-right ms-1"></i>
-                            </a>
-                        </div>
-                    </div>
-                    {% endif %}
                 </div>
+
             </div>
         </div>
         
-        <!-- 真实频谱部分 -->
-        <div class="col-md-6 mb-4">
-            <div class="card spectrum-card h-100">
-                <div class="card-header bg-success text-white">
-                    <h4 class="mb-0">真实频谱</h4>
+        <!-- 频谱展示区域 -->
+        <div class="col-md-9">
+            <div class="card spectrum-card">
+                <div class="card-header {% if spectrum_type == 'generated' %}bg-info{% else %}bg-success{% endif %} text-white">
+                    <h4 class="mb-0">{% if spectrum_type == 'generated' %}生成频谱{% else %}真实频谱{% endif %}</h4>
                 </div>
-                <div class="card-body d-flex flex-column">
-                    <div class="spectrum-container mb-3">
-                        {% if current_real %}
-                            <img src="{{ url_for('get_spectrum_image', directory='real', filename=current_real) }}" 
-                                 class="img-fluid spectrum-img" alt="真实频谱图像">
-                            <div class="text-center mt-2 text-muted">
-                                图像 {{ real_index + 1 }}/{{ real_images|length }} - {{ current_real }}
-                            </div>
+                <div class="card-body">
+                    <div class="spectrum-container mb-4">
+                        {% if spectrum_type == 'generated' %}
+                            {% if current_generated %}
+                                <img src="{{ url_for('get_spectrum_image', directory='gene', filename=current_generated) }}" 
+                                     class="img-fluid spectrum-img" alt="生成频谱图像">
+                                <div class="text-center mt-2 text-muted">
+                                    图像 {{ generated_index + 1 }}/{{ generated_images|length }} - {{ current_generated }}
+                                </div>
+                            {% else %}
+                                <div class="alert alert-info text-center py-5">
+                                    <i class="bi bi-exclamation-circle me-2"></i>无可用的生成频谱图像
+                                </div>
+                            {% endif %}
                         {% else %}
-                            <div class="alert alert-info text-center py-5">
-                                <i class="bi bi-exclamation-circle me-2"></i>无可用的真实频谱图像
-                            </div>
+                            {% if current_real %}
+                                <img src="{{ url_for('get_spectrum_image', directory='real', filename=current_real) }}" 
+                                     class="img-fluid spectrum-img" alt="真实频谱图像">
+                                <div class="text-center mt-2 text-muted">
+                                    图像 {{ real_index + 1 }}/{{ real_images|length }} - {{ current_real }}
+                                </div>
+                            {% else %}
+                                <div class="alert alert-info text-center py-5">
+                                    <i class="bi bi-exclamation-circle me-2"></i>无可用的真实频谱图像
+                                </div>
+                            {% endif %}
                         {% endif %}
                     </div>
                     
-                    {% if real_images %}
-                    <div class="mt-auto">
-                        <div class="d-flex justify-content-between">
-                            <a href="{{ url_for('spectrum', gen_idx=generated_index, real_idx=real_index-1) }}" 
+                    <div class="d-flex justify-content-between">
+                        {% if spectrum_type == 'generated' %}
+                            {% if generated_images %}
+                            <a href="{{ url_for('spectrum', type='generated', gen_idx=generated_index-1, real_idx=real_index) }}" 
+                               class="btn btn-outline-info {% if generated_index == 0 %}disabled{% endif %}">
+                                <i class="bi bi-arrow-left me-1"></i>上一张
+                            </a>
+                            <a href="{{ url_for('spectrum', type='generated', gen_idx=generated_index+1, real_idx=real_index) }}" 
+                               class="btn btn-outline-info {% if generated_index == generated_images|length - 1 %}disabled{% endif %}">
+                                下一张<i class="bi bi-arrow-right ms-1"></i>
+                            </a>
+                            {% endif %}
+                        {% else %}
+                            {% if real_images %}
+                            <a href="{{ url_for('spectrum', type='real', gen_idx=generated_index, real_idx=real_index-1) }}" 
                                class="btn btn-outline-success {% if real_index == 0 %}disabled{% endif %}">
                                 <i class="bi bi-arrow-left me-1"></i>上一张
                             </a>
-                            <a href="{{ url_for('spectrum', gen_idx=generated_index, real_idx=real_index+1) }}" 
+                            <a href="{{ url_for('spectrum', type='real', gen_idx=generated_index, real_idx=real_index+1) }}" 
                                class="btn btn-outline-success {% if real_index == real_images|length - 1 %}disabled{% endif %}">
                                 下一张<i class="bi bi-arrow-right ms-1"></i>
                             </a>
-                        </div>
+                            {% endif %}
+                        {% endif %}
                     </div>
-                    {% endif %}
                 </div>
             </div>
+
         </div>
     </div>
-    
-
 </div>
 {% endblock %} 

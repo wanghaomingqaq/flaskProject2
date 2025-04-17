@@ -10,16 +10,66 @@
         </div>
     </div>
 
-    <!-- 生成信号和真实信号展示区 -->
-    <div class="row mb-4">
-        <!-- 生成信号部分 -->
-        <div class="col-md-6 mb-4">
-            <div class="card signal-card h-100">
+    <div class="row">
+        <!-- 侧边栏切换按钮 -->
+        <div class="col-md-3">
+            <div class="card signal-sidebar mb-4">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">信号类型</h5>
+                </div>
+                <div class="card-body p-0">
+                    <div class="list-group list-group-flush">
+                        <a href="{{ url_for('signal_conversion', type='generated', gen_idx=generated_index, real_idx=real_index, comp_idx=compare_index) }}" 
+                           class="list-group-item list-group-item-action d-flex align-items-center {% if signal_type == 'generated' %}active{% endif %}">
+                            <i class="bi bi-waveform me-3 fs-5"></i>
+                            <div>
+                                <strong>生成信号</strong>
+                                <div class="small text-muted">模型生成的触觉信号</div>
+                            </div>
+                        </a>
+                        <a href="{{ url_for('signal_conversion', type='real', gen_idx=generated_index, real_idx=real_index, comp_idx=compare_index) }}" 
+                           class="list-group-item list-group-item-action d-flex align-items-center {% if signal_type == 'real' %}active{% endif %}">
+                            <i class="bi bi-activity me-3 fs-5"></i>
+                            <div>
+                                <strong>真实信号</strong>
+                                <div class="small text-muted">实际采集的触觉信号</div>
+                            </div>
+                        </a>
+                        <a href="{{ url_for('signal_conversion', type='compare', gen_idx=generated_index, real_idx=real_index, comp_idx=compare_index) }}" 
+                           class="list-group-item list-group-item-action d-flex align-items-center {% if signal_type == 'compare' %}active{% endif %}">
+                            <i class="bi bi-arrow-left-right me-3 fs-5"></i>
+                            <div>
+                                <strong>信号对比</strong>
+                                <div class="small text-muted">生成信号与真实信号的对比</div>
+                            </div>
+                        </a>
+                    </div>
+                </div>
+                
+                <div class="card-body">
+                    <div class="signal-info-card">
+                        <div class="info-header">
+                            <i class="bi bi-info-circle me-2"></i>
+                            <span>信号说明</span>
+                        </div>
+                        <div class="info-body">
+                            <p class="small mb-2">触觉信号展示了振动在时间域的变化。</p>
+                            <p class="small mb-0">水平轴表示时间(s)，垂直轴表示幅度。</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 信号展示区域 -->
+        <div class="col-md-9">
+            <div class="card signal-card">
+                {% if signal_type == 'generated' %}
                 <div class="card-header bg-primary text-white">
                     <h4 class="mb-0">生成信号</h4>
                 </div>
-                <div class="card-body d-flex flex-column">
-                    <div class="signal-container mb-3">
+                <div class="card-body">
+                    <div class="signal-container mb-4">
                         {% if current_generated %}
                             <img src="{{ url_for('get_signal_image', directory='gene', filename=current_generated) }}" 
                                  class="img-fluid signal-img" alt="生成信号图像">
@@ -34,31 +84,24 @@
                     </div>
                     
                     {% if generated_images %}
-                    <div class="mt-auto">
-                        <div class="d-flex justify-content-between">
-                            <a href="{{ url_for('signal_conversion', gen_idx=generated_index-1, real_idx=real_index, comp_idx=compare_index) }}" 
-                               class="btn btn-outline-primary {% if generated_index == 0 %}disabled{% endif %}">
-                                <i class="bi bi-arrow-left me-1"></i>上一张
-                            </a>
-                            <a href="{{ url_for('signal_conversion', gen_idx=generated_index+1, real_idx=real_index, comp_idx=compare_index) }}" 
-                               class="btn btn-outline-primary {% if generated_index == generated_images|length - 1 %}disabled{% endif %}">
-                                下一张<i class="bi bi-arrow-right ms-1"></i>
-                            </a>
-                        </div>
+                    <div class="d-flex justify-content-between">
+                        <a href="{{ url_for('signal_conversion', type='generated', gen_idx=generated_index-1, real_idx=real_index, comp_idx=compare_index) }}" 
+                           class="btn btn-outline-primary {% if generated_index == 0 %}disabled{% endif %}">
+                            <i class="bi bi-arrow-left me-1"></i>上一张
+                        </a>
+                        <a href="{{ url_for('signal_conversion', type='generated', gen_idx=generated_index+1, real_idx=real_index, comp_idx=compare_index) }}" 
+                           class="btn btn-outline-primary {% if generated_index == generated_images|length - 1 %}disabled{% endif %}">
+                            下一张<i class="bi bi-arrow-right ms-1"></i>
+                        </a>
                     </div>
                     {% endif %}
                 </div>
-            </div>
-        </div>
-        
-        <!-- 真实信号部分 -->
-        <div class="col-md-6 mb-4">
-            <div class="card signal-card h-100">
+                {% elif signal_type == 'real' %}
                 <div class="card-header bg-success text-white">
                     <h4 class="mb-0">真实信号</h4>
                 </div>
-                <div class="card-body d-flex flex-column">
-                    <div class="signal-container mb-3">
+                <div class="card-body">
+                    <div class="signal-container mb-4">
                         {% if current_real %}
                             <img src="{{ url_for('get_signal_image', directory='real', filename=current_real) }}" 
                                  class="img-fluid signal-img" alt="真实信号图像">
@@ -73,62 +116,49 @@
                     </div>
                     
                     {% if real_images %}
-                    <div class="mt-auto">
-                        <div class="d-flex justify-content-between">
-                            <a href="{{ url_for('signal_conversion', gen_idx=generated_index, real_idx=real_index-1, comp_idx=compare_index) }}" 
-                               class="btn btn-outline-success {% if real_index == 0 %}disabled{% endif %}">
-                                <i class="bi bi-arrow-left me-1"></i>上一张
-                            </a>
-                            <a href="{{ url_for('signal_conversion', gen_idx=generated_index, real_idx=real_index+1, comp_idx=compare_index) }}" 
-                               class="btn btn-outline-success {% if real_index == real_images|length - 1 %}disabled{% endif %}">
-                                下一张<i class="bi bi-arrow-right ms-1"></i>
-                            </a>
-                        </div>
+                    <div class="d-flex justify-content-between">
+                        <a href="{{ url_for('signal_conversion', type='real', gen_idx=generated_index, real_idx=real_index-1, comp_idx=compare_index) }}" 
+                           class="btn btn-outline-success {% if real_index == 0 %}disabled{% endif %}">
+                            <i class="bi bi-arrow-left me-1"></i>上一张
+                        </a>
+                        <a href="{{ url_for('signal_conversion', type='real', gen_idx=generated_index, real_idx=real_index+1, comp_idx=compare_index) }}" 
+                           class="btn btn-outline-success {% if real_index == real_images|length - 1 %}disabled{% endif %}">
+                            下一张<i class="bi bi-arrow-right ms-1"></i>
+                        </a>
                     </div>
                     {% endif %}
                 </div>
-            </div>
-        </div>
-    </div>
-    
-    <!-- 对比图展示区 -->
-    <div class="row">
-        <div class="col-12">
-            <div class="card signal-card">
+                {% else %}
                 <div class="card-header bg-warning text-dark">
                     <h4 class="mb-0">信号对比</h4>
                 </div>
                 <div class="card-body">
-                    <div class="row">
-                        <div class="col-md-8 mx-auto">
-                            <div class="signal-container mb-3">
-                                {% if current_compare %}
-                                    <img src="{{ url_for('get_signal_image', directory='compare', filename=current_compare) }}" 
-                                         class="img-fluid signal-img-large" alt="信号对比图像">
-                                    <div class="text-center mt-2 text-muted">
-                                        对比图 {{ compare_index + 1 }}/{{ compare_images|length }} - {{ current_compare }}
-                                    </div>
-                                {% else %}
-                                    <div class="alert alert-info text-center py-5">
-                                        <i class="bi bi-exclamation-circle me-2"></i>无可用的信号对比图像
-                                    </div>
-                                {% endif %}
+                    <div class="signal-container mb-4">
+                        {% if current_compare %}
+                            <img src="{{ url_for('get_signal_image', directory='compare', filename=current_compare) }}" 
+                                 class="img-fluid signal-img-large" alt="信号对比图像">
+                            <div class="text-center mt-2 text-muted">
+                                对比图 {{ compare_index + 1 }}/{{ compare_images|length }} - {{ current_compare }}
                             </div>
-                            
-                            {% if compare_images %}
-                            <div class="d-flex justify-content-center mt-3">
-                                <a href="{{ url_for('signal_conversion', gen_idx=generated_index, real_idx=real_index, comp_idx=compare_index-1) }}" 
-                                   class="btn btn-outline-warning me-2 {% if compare_index == 0 %}disabled{% endif %}">
-                                    <i class="bi bi-arrow-left me-1"></i>上一张
-                                </a>
-                                <a href="{{ url_for('signal_conversion', gen_idx=generated_index, real_idx=real_index, comp_idx=compare_index+1) }}" 
-                                   class="btn btn-outline-warning {% if compare_index == compare_images|length - 1 %}disabled{% endif %}">
-                                    下一张<i class="bi bi-arrow-right ms-1"></i>
-                                </a>
+                        {% else %}
+                            <div class="alert alert-info text-center py-5">
+                                <i class="bi bi-exclamation-circle me-2"></i>无可用的信号对比图像
                             </div>
-                            {% endif %}
-                        </div>
+                        {% endif %}
                     </div>
+                    
+                    {% if compare_images %}
+                    <div class="d-flex justify-content-between">
+                        <a href="{{ url_for('signal_conversion', type='compare', gen_idx=generated_index, real_idx=real_index, comp_idx=compare_index-1) }}" 
+                           class="btn btn-outline-warning {% if compare_index == 0 %}disabled{% endif %}">
+                            <i class="bi bi-arrow-left me-1"></i>上一张
+                        </a>
+                        <a href="{{ url_for('signal_conversion', type='compare', gen_idx=generated_index, real_idx=real_index, comp_idx=compare_index+1) }}" 
+                           class="btn btn-outline-warning {% if compare_index == compare_images|length - 1 %}disabled{% endif %}">
+                            下一张<i class="bi bi-arrow-right ms-1"></i>
+                        </a>
+                    </div>
+                    {% endif %}
                     
                     <div class="mt-4 signal-legend">
                         <div class="d-flex justify-content-center flex-wrap">
@@ -143,6 +173,7 @@
                         </div>
                     </div>
                 </div>
+                {% endif %}
             </div>
         </div>
     </div>
